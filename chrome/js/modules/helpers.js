@@ -295,6 +295,12 @@ pm.helpers = {
                 }
             }
 
+            // oauth_body_hash
+            if ($('#request-helper-use-body-hash').attr('checked')) {
+                var oauthBodyHash = b64_sha1(pm.request.body.data || '');
+                message.parameters.push(['oauth_body_hash', oauthBodyHash]);
+            }
+
             var accessor = {};
             if ($('input[key="oauth_consumer_secret"]').val() != '') {
                 accessor.consumerSecret = $('input[key="oauth_consumer_secret"]').val();
@@ -350,6 +356,11 @@ pm.helpers = {
 
             params = pm.helpers.oAuth1.removeOAuthKeys(params);
             var signatureKey = "oauth_signature";
+
+            if ($('#request-helper-use-body-hash').attr('checked') &&
+                (pm.request.body.mode !== "urlencoded")) {
+                params.push({key: 'oauth_body_hash', value: b64_sha1(pm.request.body.data || '')});
+            }
 
             $('input.signatureParam').each(function () {
                 if ($(this).val() != '' || $('#request-helper-keep-empty-parameters').attr('checked')) {
